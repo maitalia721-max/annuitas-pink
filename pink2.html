@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Anuitas</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Color Palette Variables
+           FBEFEF : Base Background
+           FFE2E2 : Card / Table Row Accent
+           B35656 : Text & Accent Elements
+        */
+        :root {
+            --bg-base: #FBEFEF;
+            --bg-card: #FFFFFF;
+            --bg-table-accent: #FFE2E2;
+            --text-primary: #B35656;
+            --text-muted: #d17878;
+            --border-color: #f7cece;
+            --btn-hover: #964242;
+            --shadow: 0 10px 30px rgba(179, 86, 86, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .calculator-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.75rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--bg-table-accent);
+            padding-bottom: 0.5rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .input-wrapper, .tenure-group {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper:focus-within, .tenure-group:focus-within {
+            border-color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(179, 86, 86, 0.15);
+        }
+
+        .input-wrapper input, .tenure-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            color: var(--text-primary);
+            outline: none;
+            font-weight: 500;
+        }
+
+        .input-wrapper .prefix, .input-wrapper .suffix {
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            background-color: var(--bg-table-accent);
+        }
+
+        .tenure-group select {
+            padding: 0.75rem 1rem;
+            border: none;
+            background-color: var(--bg-table-accent);
+            color: var(--text-primary);
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 10px;
+            padding: 0.85rem 1.25rem;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--text-primary);
+            color: #ffffff;
+            flex: 2;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--btn-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-table-accent);
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f7cece;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--text-primary);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--bg-table-accent);
+        }
+
+        .summary-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            padding: 0.85rem;
+            border-radius: 10px;
+            background-color: var(--bg-base);
+        }
+
+        .summary-item.highlight {
+            background-color: var(--bg-table-accent);
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-item span {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .summary-item.highlight span {
+            color: var(--text-primary);
+        }
+
+        .summary-item h3 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .summary-item p {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-header h2 {
+            margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: right;
+            font-size: 0.9rem;
+        }
+
+        table th {
+            background-color: var(--bg-table-accent);
+            color: var(--text-primary);
+            padding: 0.85rem 1rem;
+            font-weight: 700;
+            white-space: nowrap;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        table td {
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        table th:first-child, table td:first-child {
+            text-align: center;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: rgba(255, 226, 226, 0.3);
+        }
+
+        table tbody tr:hover {
+            background-color: var(--bg-table-accent);
+        }
+
+        .empty-msg {
+            text-align: center !important;
+            color: var(--text-muted);
+            padding: 2.5rem !important;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Kalkulator Anuitas</h1>
+            <p>Hitung angsuran, bunga, dan cicilan pokok bulanan Anda dengan mudah.</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="calculator-grid">
+            <!-- Form Input -->
+            <div class="card form-card">
+                <h2>Parameter Pinjaman</h2>
+                <form id="annuityForm">
+                    <div class="input-group">
+                        <label for="principal">Jumlah Pinjaman (Plafond)</label>
+                        <div class="input-wrapper">
+                            <span class="prefix">Rp</span>
+                            <input type="number" id="principal" placeholder="Contoh: 100000000" min="1" step="any" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="interestRate">Suku Bunga Tahunan (%)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="interestRate" placeholder="Contoh: 10" min="0.01" max="100" step="any" required>
+                            <span class="suffix">%</span>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="tenure">Jangka Waktu (Tenor)</label>
+                        <div class="tenure-group">
+                            <input type="number" id="tenure" placeholder="Contoh: 12" min="1" required>
+                            <select id="tenureType">
+                                <option value="months">Bulan</option>
+                                <option value="years">Tahun</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-primary">Hitung Anuitas</button>
+                        <button type="button" id="resetBtn" class="btn-secondary">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Ringkasan Hasil -->
+            <div class="card summary-card" id="summaryCard">
+                <h2>Ringkasan Angsuran</h2>
+                <div class="summary-details">
+                    <div class="summary-item highlight">
+                        <span>Angsuran Per Bulan</span>
+                        <h3 id="monthlyPaymentDisplay">Rp 0</h3>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Pinjaman</span>
+                        <p id="totalPrincipalDisplay">Rp 0</p>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Bunga</span>
+                        <p id="totalInterestDisplay">Rp 0</p>
+                    </div>
+                    <div class="summary-item">
+                        <span>Total Pembayaran</span>
+                        <p id="totalPaymentDisplay">Rp 0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Jadwal Anuitas -->
+        <div class="card table-card" id="resultSection">
+            <div class="table-header">
+                <h2>Jadwal Angsuran Anuitas</h2>
+                <button id="exportCsvBtn" class="btn-outline">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Ekspor CSV
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table id="scheduleTable">
+                    <thead>
+                        <tr>
+                            <th>Bulan Ke-</th>
+                            <th>Angsuran (Rp)</th>
+                            <th>Angsuran Pokok (Rp)</th>
+                            <th>Angsuran Bunga (Rp)</th>
+                            <th>Sisa Pinjaman (Rp)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="5" class="empty-msg">Masukkan data di atas lalu klik "Hitung Anuitas" untuk melihat hasil.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('annuityForm');
+            const resetBtn = document.getElementById('resetBtn');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+            const tableBody = document.getElementById('tableBody');
+
+            const monthlyPaymentDisplay = document.getElementById('monthlyPaymentDisplay');
+            const totalPrincipalDisplay = document.getElementById('totalPrincipalDisplay');
+            const totalInterestDisplay = document.getElementById('totalInterestDisplay');
+            const totalPaymentDisplay = document.getElementById('totalPaymentDisplay');
+
+            let scheduleData = [];
+
+            const formatCurrency = (val) => {
+                return new Intl.NumberFormat('id-ID', {
+                    style: 'currency',
+                    currency: 'IDR',
+                    maximumFractionDigits: 0
+                }).format(val);
+            };
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const principal = parseFloat(document.getElementById('principal').value);
+                const annualRate = parseFloat(document.getElementById('interestRate').value);
+                let tenure = parseInt(document.getElementById('tenure').value);
+                const tenureType = document.getElementById('tenureType').value;
+
+                if (isNaN(principal) || isNaN(annualRate) || isNaN(tenure) || principal <= 0 || annualRate <= 0 || tenure <= 0) {
+                    alert('Mohon masukkan nilai angka yang valid!');
+                    return;
+                }
+
+                const totalMonths = tenureType === 'years' ? tenure * 12 : tenure;
+                const monthlyRate = annualRate / 100 / 12;
+
+                const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, totalMonths)) / (Math.pow(1 + monthlyRate, totalMonths) - 1);
+
+                let currentBalance = principal;
+                let totalInterest = 0;
+                scheduleData = [];
+
+                tableBody.innerHTML = '';
+
+                for (let month = 1; month <= totalMonths; month++) {
+                    const interestPayment = currentBalance * monthlyRate;
+                    let principalPayment = monthlyPayment - interestPayment;
+
+                    if (month === totalMonths) {
+                        principalPayment = currentBalance;
+                    }
+
+                    currentBalance -= principalPayment;
+                    if (currentBalance < 0) currentBalance = 0;
+
+                    totalInterest += interestPayment;
+
+                    scheduleData.push({
+                        month,
+                        payment: monthlyPayment,
+                        principalPart: principalPayment,
+                        interestPart: interestPayment,
+                        balance: currentBalance
+                    });
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${month}</td>
+                        <td>${formatCurrency(monthlyPayment)}</td>
+                        <td>${formatCurrency(principalPayment)}</td>
+                        <td>${formatCurrency(interestPayment)}</td>
+                        <td>${formatCurrency(currentBalance)}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+
+                const totalPayment = principal + totalInterest;
+
+                monthlyPaymentDisplay.innerText = formatCurrency(monthlyPayment);
+                totalPrincipalDisplay.innerText = formatCurrency(principal);
+                totalInterestDisplay.innerText = formatCurrency(totalInterest);
+                totalPaymentDisplay.innerText = formatCurrency(totalPayment);
+            });
+
+            resetBtn.addEventListener('click', () => {
+                form.reset();
+                scheduleData = [];
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-msg">Masukkan data di atas lalu klik "Hitung Anuitas" untuk melihat hasil.</td>
+                    </tr>
+                `;
+                monthlyPaymentDisplay.innerText = 'Rp 0';
+                totalPrincipalDisplay.innerText = 'Rp 0';
+                totalInterestDisplay.innerText = 'Rp 0';
+                totalPaymentDisplay.innerText = 'Rp 0';
+            });
+
+            exportCsvBtn.addEventListener('click', () => {
+                if (scheduleData.length === 0) {
+                    alert('Belum ada data kalkulasi untuk di-ekspor!');
+                    return;
+                }
+
+                let csvContent = 'data:text/csv;charset=utf-8,';
+                csvContent += 'Bulan,Angsuran (Rp),Angsuran Pokok (Rp),Angsuran Bunga (Rp),Sisa Pinjaman (Rp)\n';
+
+                scheduleData.forEach((row) => {
+                    csvContent += `${row.month},${Math.round(row.payment)},${Math.round(row.principalPart)},${Math.round(row.interestPart)},${Math.round(row.balance)}\n`;
+                });
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement('a');
+                link.setAttribute('href', encodedUri);
+                link.setAttribute('download', 'jadwal_angsuran_anuitas.csv');
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
+    </script>
+</body>
+</html>
